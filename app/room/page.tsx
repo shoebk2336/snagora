@@ -191,7 +191,7 @@ export default function RoomPage() {
   };
 
   return (
-    <div className="flex flex-1 flex-col bg-background h-[calc(100vh-7.5rem)] w-full overflow-hidden relative min-h-0">
+    <div className="flex flex-1 flex-col bg-background h-full w-full overflow-hidden relative min-h-0">
       
       {/* 1. ROOM DETAILS SCREEN (when roomId is selected) */}
       {roomIdParam && activeRoom ? (

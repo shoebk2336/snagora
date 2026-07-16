@@ -235,7 +235,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full bg-slate-100 dark:bg-slate-950 flex items-center justify-center antialiased" suppressHydrationWarning>
         {/* Constrain mobile view in desktop browser */}
-        <div className="w-full max-w-md h-screen bg-background text-foreground shadow-2xl relative flex flex-col pb-16 overflow-hidden">
+        <div className="w-full max-w-md h-dvh bg-background text-foreground shadow-2xl relative flex flex-col pb-16 overflow-hidden">
           
           {/* Global Header */}
           <header className="flex h-14 items-center justify-between border-b border-border bg-surface px-4 z-10 sticky top-0">

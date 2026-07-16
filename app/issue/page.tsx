@@ -395,7 +395,7 @@ export default function IssuePage() {
   ) || [];
 
   return (
-    <div className="flex flex-1 flex-col bg-background h-[calc(100vh-7.5rem)] w-full overflow-hidden relative min-h-0">
+    <div className="flex flex-1 flex-col bg-background h-full w-full overflow-hidden relative min-h-0">
       
       {/* Photo annotation full-screen modal */}
       {activeAnnotationIdx !== null && photos[activeAnnotationIdx] && (

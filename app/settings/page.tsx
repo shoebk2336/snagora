@@ -8,7 +8,7 @@ import { useLicenseStore } from '@/store/licenseStore';
 import {
   ArrowLeft, User, CreditCard, Sun, Moon, Shield,
   Trash2, LogOut, ChevronRight, Info, AlertTriangle,
-  Smartphone, FileText
+  Smartphone, FileText, Coins, X, Award, Terminal
 } from 'lucide-react';
 
 export default function SettingsPage() {
@@ -18,6 +18,8 @@ export default function SettingsPage() {
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showClearDataModal, setShowClearDataModal] = useState(false);
+  const [showAboutModal, setShowAboutModal] = useState(false);
+  const [expandedPerson, setExpandedPerson] = useState<'shoeb' | 'rayyan' | null>(null);
 
   // Theme from layout state
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -69,6 +71,12 @@ export default function SettingsPage() {
             ? '/activate' 
             : '/subscription' 
         },
+        {
+          icon: Coins,
+          label: 'Purchase Mode',
+          description: 'Buy credits, activate coupons, or upgrade',
+          href: '/activate'
+        },
       ],
     },
     {
@@ -90,6 +98,7 @@ export default function SettingsPage() {
         { icon: Shield, label: 'App Version', description: '1.0.0 (Build 1)', static: true },
         { icon: Smartphone, label: 'Platform', description: typeof navigator !== 'undefined' ? (navigator.userAgent.includes('Android') ? 'Android (Capacitor)' : 'Web Browser') : 'Web', static: true },
         { icon: FileText, label: 'License Status', description: subscriptionStatus === 'active' ? 'Valid' : subscriptionStatus === 'expired' ? 'Expired' : 'Inactive', static: true },
+        { icon: Info, label: 'About Us', description: 'Developed by & Domain Experts', action: () => setShowAboutModal(true) },
       ],
     },
     {
@@ -102,7 +111,7 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="flex flex-1 flex-col bg-background h-[calc(100vh-7.5rem)] w-full overflow-hidden relative min-h-0">
+    <div className="flex flex-1 flex-col bg-background h-full w-full overflow-hidden relative min-h-0">
       <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-4 space-y-5 pb-24 min-h-0">
 
         {/* Header */}
@@ -212,6 +221,117 @@ export default function SettingsPage() {
             <div className="flex gap-3 pt-2">
               <button onClick={() => setShowClearDataModal(false)} className="flex-1 h-10 rounded-xl border border-border text-slate-600 dark:text-slate-400 font-semibold text-xs hover:bg-slate-50 dark:hover:bg-slate-800">Cancel</button>
               <button onClick={handleClearData} className="flex-1 h-10 rounded-xl bg-rose-600 text-white font-semibold text-xs hover:bg-rose-500 shadow">Yes, Clear Everything</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* About Us Modal */}
+      {showAboutModal && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 px-0 sm:px-4">
+          <div className="w-full sm:max-w-md bg-surface rounded-t-3xl sm:rounded-3xl border border-border shadow-2xl overflow-hidden flex flex-col max-h-[85vh] sm:max-h-[90vh] animate-in slide-in-from-bottom duration-300">
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border bg-slate-50 dark:bg-slate-850/40">
+              <div className="flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-gradient-from to-gradient-to text-white shadow-sm">
+                  <Shield className="h-4.5 w-4.5" />
+                </div>
+                <h3 className="text-sm font-bold text-foreground">About Snagora</h3>
+              </div>
+              <button 
+                onClick={() => setShowAboutModal(false)}
+                className="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors text-slate-500"
+              >
+                <X className="h-4.5 w-4.5" />
+              </button>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto no-scrollbar p-5 space-y-4">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 text-center max-w-xs mx-auto leading-relaxed">
+                Snagora is a state-of-the-art offline-first inspection and building snagging platform designed for modern field operations.
+              </p>
+
+              {/* Shoeb Muzaffar Khan Card */}
+              <div 
+                className="group p-4 rounded-2xl border border-border bg-slate-50 dark:bg-slate-850/40 hover:border-accent/40 transition-all duration-300"
+                onMouseEnter={() => setExpandedPerson('shoeb')}
+                onMouseLeave={() => setExpandedPerson(null)}
+                onClick={() => setExpandedPerson(expandedPerson === 'shoeb' ? null : 'shoeb')}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1">
+                    <span className="text-[9px] font-extrabold uppercase tracking-wider text-accent flex items-center gap-1">
+                      <Terminal className="h-3 w-3" /> Developed By
+                    </span>
+                    <h4 className="text-sm font-black text-foreground">Shoeb Muzaffar Khan</h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Designer & Developer</p>
+                  </div>
+                  <button className="text-[10px] font-bold text-accent px-2.5 py-1 rounded-lg bg-accent-surface border border-accent-light/20 shadow-sm active:scale-95 transition-transform">
+                    {expandedPerson === 'shoeb' ? 'Collapse' : 'View Contributions'}
+                  </button>
+                </div>
+
+                {/* Collapsible content (Unique Contributions) */}
+                <div 
+                  className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                    expandedPerson === 'shoeb' ? 'max-h-60 opacity-100 mt-3.5 pt-3.5 border-t border-dashed border-border' : 'max-h-0 opacity-0'
+                  }`}
+                >
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block mb-2">Responsible For:</span>
+                  <ul className="space-y-1.5">
+                    {['Product Design', 'UI/UX', 'Mobile Application Development', 'System Architecture', 'Offline Reporting Engine'].map((item) => (
+                      <li key={item} className="text-xs text-slate-650 dark:text-slate-350 flex items-center gap-2">
+                        <span className="w-1 h-1 rounded-full bg-accent" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Rayyan Sohail Deshmukh Card */}
+              <div 
+                className="group p-4 rounded-2xl border border-border bg-slate-50 dark:bg-slate-850/40 hover:border-accent/40 transition-all duration-300"
+                onMouseEnter={() => setExpandedPerson('rayyan')}
+                onMouseLeave={() => setExpandedPerson(null)}
+                onClick={() => setExpandedPerson(expandedPerson === 'rayyan' ? null : 'rayyan')}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1">
+                    <span className="text-[9px] font-extrabold uppercase tracking-wider text-amber-500 flex items-center gap-1">
+                      <Award className="h-3 w-3" /> Domain Expertise
+                    </span>
+                    <h4 className="text-sm font-black text-foreground">Rayyan Sohail Deshmukh</h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Senior HVAC Supervisor, Dubai</p>
+                  </div>
+                  <button className="text-[10px] font-bold text-amber-500 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 shadow-sm active:scale-95 transition-transform">
+                    {expandedPerson === 'rayyan' ? 'Collapse' : 'View Contributions'}
+                  </button>
+                </div>
+
+                {/* Collapsible content (Unique Contributions) */}
+                <div 
+                  className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                    expandedPerson === 'rayyan' ? 'max-h-60 opacity-100 mt-3.5 pt-3.5 border-t border-dashed border-border' : 'max-h-0 opacity-0'
+                  }`}
+                >
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block mb-2">Contributed To:</span>
+                  <ul className="space-y-1.5">
+                    {['HVAC Inspection Workflow', 'Building Snagging Process', 'Industry Validation', 'Inspection Standards & Field Requirements'].map((item) => (
+                      <li key={item} className="text-xs text-slate-650 dark:text-slate-350 flex items-center gap-2">
+                        <span className="w-1 h-1 rounded-full bg-amber-500" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 border-t border-border bg-slate-50 dark:bg-slate-850/40 text-center">
+              <p className="text-[9px] text-slate-400">© 2026 Snagora. All rights reserved.</p>
             </div>
           </div>
         </div>
