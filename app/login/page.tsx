@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Loader2, ShieldCheck, AlertCircle } from 'lucide-react';
-import { supabase, isSupabaseConfigured } from '@/utils/supabase';
+import { supabase, isSupabaseConfigured, getOauthRedirectUrl } from '@/utils/supabase';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,7 +21,7 @@ export default function LoginPage() {
         const { error: authError } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: `${window.location.origin}/auth/google?flow=login`,
+            redirectTo: getOauthRedirectUrl('/auth/google?flow=login'),
           },
         });
         if (authError) throw authError;

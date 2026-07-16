@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useLicenseStore } from '@/store/licenseStore';
 import { LogIn, UserPlus, Shield, ClipboardCheck, ArrowRight } from 'lucide-react';
-import { supabase, isSupabaseConfigured } from '@/utils/supabase';
+import { supabase, isSupabaseConfigured, getOauthRedirectUrl } from '@/utils/supabase';
 
 export default function HomePage() {
   const router = useRouter();
@@ -50,7 +50,7 @@ export default function HomePage() {
         const { error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: `${window.location.origin}/auth/google?flow=login`,
+            redirectTo: getOauthRedirectUrl('/auth/google?flow=login'),
           },
         });
         if (error) throw error;
@@ -69,7 +69,7 @@ export default function HomePage() {
         const { error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: `${window.location.origin}/auth/google?flow=signup`,
+            redirectTo: getOauthRedirectUrl('/auth/google?flow=signup'),
           },
         });
         if (error) throw error;

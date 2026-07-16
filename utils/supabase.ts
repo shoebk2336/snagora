@@ -35,3 +35,16 @@ export const supabase = isSupabaseConfigured()
       },
     })
   : null;
+
+/**
+ * Generates the correct OAuth redirect URL.
+ * Prioritizes NEXT_PUBLIC_SITE_URL if set (e.g., in production environment),
+ * otherwise falls back to window.location.origin.
+ */
+export const getOauthRedirectUrl = (path: string): string => {
+  if (typeof window === 'undefined') return '';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+  // Strip trailing slashes and ensure proper path slash
+  return `${baseUrl.replace(/\/+$/, '')}/${path.replace(/^\/+/, '')}`;
+};
+

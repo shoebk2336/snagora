@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
-import { supabase, isSupabaseConfigured } from '@/utils/supabase';
+import { supabase, isSupabaseConfigured, getOauthRedirectUrl } from '@/utils/supabase';
 import {
   Shield, Mail, Phone, User, ArrowLeft,
   Loader2, BadgeHelp, Building, AlertCircle
@@ -21,7 +21,7 @@ export default function RegisterPage() {
           const { error: authError } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-              redirectTo: `${window.location.origin}/auth/google?flow=signup`,
+              redirectTo: getOauthRedirectUrl('/auth/google?flow=signup'),
             },
           });
           if (authError) throw authError;
@@ -74,7 +74,7 @@ export default function RegisterPage() {
         const { error: authError } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: `${window.location.origin}/auth/google?flow=signup`,
+            redirectTo: getOauthRedirectUrl('/auth/google?flow=signup'),
           },
         });
         if (authError) throw authError;
