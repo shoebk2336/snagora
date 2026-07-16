@@ -1,0 +1,8 @@
+{
+  "appId": "com.enterprise.ebis.inspection",
+  "appName": "Snagora",
+  "webDir": "out",
+  "server": {
+    "androidScheme": "https"
+  }
+}

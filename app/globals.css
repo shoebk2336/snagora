@@ -1,0 +1,165 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --surface: #ffffff;
+  --surface-variant: #f1f5f9;
+  --primary: #4f46e5;
+  --primary-foreground: #ffffff;
+  --secondary: #475569;
+  --secondary-foreground: #ffffff;
+  --border: #e2e8f0;
+
+  /* ── Brand Accent System ── */
+  --accent: #0d9488;
+  --accent-foreground: #ffffff;
+  --accent-light: #99f6e4;
+  --accent-surface: #f0fdfa;
+  --accent-surface-alt: rgba(13,148,136,0.10);
+  --accent-glow: rgba(20,184,166,0.25);
+  --accent-muted: #5eead4;
+
+  /* ── Gradient Stops ── */
+  --gradient-from: #14b8a6;
+  --gradient-via: #06b6d4;
+  --gradient-to: #0ea5e9;
+
+  /* ── Priority Colors ── */
+  --priority-critical: #ef4444;
+  --priority-critical-fg: #ffffff;
+  --priority-high: #f97316;
+  --priority-high-fg: #ffffff;
+  --priority-medium: #eab308;
+  --priority-medium-fg: #0f172a;
+  --priority-low: #3b82f6;
+  --priority-low-fg: #ffffff;
+  --priority-cosmetic: #64748b;
+  --priority-cosmetic-fg: #ffffff;
+
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* Dark mode overrides */
+.dark {
+  --background: #0f172a;
+  --foreground: #f8fafc;
+  --surface: #1e293b;
+  --surface-variant: #334155;
+  --primary: #818cf8;
+  --primary-foreground: #0f172a;
+  --secondary: #94a3b8;
+  --secondary-foreground: #0f172a;
+  --border: #334155;
+
+  /* ── Brand Accent System (Dark) ── */
+  --accent: #2dd4bf;
+  --accent-foreground: #0f172a;
+  --accent-light: #0d9488;
+  --accent-surface: rgba(13,148,136,0.15);
+  --accent-surface-alt: rgba(45,212,191,0.10);
+  --accent-glow: rgba(45,212,191,0.20);
+  --accent-muted: #14b8a6;
+
+  /* Gradient stops stay vibrant in dark mode */
+  --gradient-from: #14b8a6;
+  --gradient-via: #06b6d4;
+  --gradient-to: #0ea5e9;
+
+  --priority-critical: #f87171;
+  --priority-critical-fg: #0f172a;
+  --priority-high: #fb923c;
+  --priority-high-fg: #0f172a;
+  --priority-medium: #facc15;
+  --priority-medium-fg: #0f172a;
+  --priority-low: #60a5fa;
+  --priority-low-fg: #0f172a;
+  --priority-cosmetic: #94a3b8;
+  --priority-cosmetic-fg: #0f172a;
+}
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-variant: var(--surface-variant);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-border: var(--border);
+
+  /* Accent tokens */
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-light: var(--accent-light);
+  --color-accent-surface: var(--accent-surface);
+  --color-accent-surface-alt: var(--accent-surface-alt);
+  --color-accent-glow: var(--accent-glow);
+  --color-accent-muted: var(--accent-muted);
+
+  /* Gradient tokens */
+  --color-gradient-from: var(--gradient-from);
+  --color-gradient-via: var(--gradient-via);
+  --color-gradient-to: var(--gradient-to);
+
+  /* Priority tokens */
+  --color-priority-critical: var(--priority-critical);
+  --color-priority-critical-fg: var(--priority-critical-fg);
+  --color-priority-high: var(--priority-high);
+  --color-priority-high-fg: var(--priority-high-fg);
+  --color-priority-medium: var(--priority-medium);
+  --color-priority-medium-fg: var(--priority-medium-fg);
+  --color-priority-low: var(--priority-low);
+  --color-priority-low-fg: var(--priority-low-fg);
+  --color-priority-cosmetic: var(--priority-cosmetic);
+  --color-priority-cosmetic-fg: var(--priority-cosmetic-fg);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  overflow-x: hidden;
+}
+
+/* Custom transitions and scrollbar hides */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Active Material ripple feedback simulation */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+.ripple::after {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+  background-repeat: no-repeat;
+  background-position: 50%;
+  transform: scale(10, 10);
+  opacity: 0;
+  transition: transform .5s, opacity 1s;
+}
+.ripple:active::after {
+  transform: scale(0, 0);
+  opacity: .3;
+  transition: 0s;
+}
