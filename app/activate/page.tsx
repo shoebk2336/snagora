@@ -130,7 +130,7 @@ function ActivateContent() {
     }
   };
 
-  // Option 3: Contact Admin (Prefilled mailto composer)
+  // Option 3: Contact Admin (Send inquiry to Supabase)
   const handleContactSales = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -143,16 +143,26 @@ function ActivateContent() {
 
     setLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Send inquiry email via API route
+      const res = await fetch('/api/send-inquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: salesName,
+          email: user.email || '',
+          message: salesMessage,
+        }),
+      });
 
-      // Open user's default email client via mailto
-      const recipients = 'shoebk478@gmail.com,snagora.app@gmail.com,snag.support@gmail.com';
-      const mailtoUrl = `mailto:${recipients}?subject=Admin Inquiry from ${encodeURIComponent(salesName)}&body=${encodeURIComponent(
-        `Name: ${salesName}\nEmail: ${user.email || ''}\n\nMessage:\n${salesMessage}`
-      )}`;
-      window.open(mailtoUrl, '_blank');
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        console.error('Failed to send inquiry:', errData);
+        setError('Failed to send inquiry. Please try again.');
+        setLoading(false);
+        return;
+      }
 
-      setSuccess('Sales request prepared! A 14-day starter license has been assigned to your device.');
+      setSuccess('Inquiry sent to support team! A 14-day starter license has been activated.');
 
       // Assign review trial license so they can explore the app in the meantime
       const mockLicense: License = {
@@ -176,7 +186,7 @@ function ActivateContent() {
 
       setTimeout(() => router.push('/dashboard'), 2000);
     } catch (err) {
-      setError('Failed to generate sales request. Please try again.');
+      setError('Failed to send inquiry. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -268,24 +278,7 @@ function ActivateContent() {
                 </div>
               </button>
 
-              {/* Option 3: Contact Admin */}
-              <button
-                onClick={() => setMethod('sales')}
-                className="w-full p-4 rounded-3xl border border-border bg-surface hover:bg-slate-50 dark:hover:bg-slate-800 text-left shadow-sm transition-all group ripple"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent-surface text-accent group-hover:scale-105 transition-transform">
-                    <Mail className="h-6 w-6" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-sm font-bold text-foreground">Contact Admin</h3>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
-                      Submit an inquiry via Gmail to request license activation
-                    </p>
-                  </div>
-                  <ArrowRight className="h-5 w-5 text-slate-400 group-hover:text-accent transition-colors" />
-                </div>
-              </button>
+
 
               {/* Demo Hint */}
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-850/40 border border-border flex gap-2.5 text-[10px] text-slate-500 dark:text-slate-400">
@@ -404,10 +397,10 @@ function ActivateContent() {
           {method === 'sales' && (
             <div className="space-y-4">
               <button
-                onClick={() => { setMethod('choose'); setError(''); setSuccess(''); }}
+                onClick={() => { router.push('/settings'); setError(''); setSuccess(''); }}
                 className="text-xs text-accent font-semibold self-start"
               >
-                ← Back to options
+                ← Back to Settings
               </button>
 
               <form onSubmit={handleContactSales} className="p-5 rounded-3xl border border-border bg-surface shadow-sm space-y-3.5">
@@ -451,9 +444,9 @@ function ActivateContent() {
                   className="w-full flex items-center justify-center gap-2 h-11 rounded-2xl bg-gradient-to-r from-gradient-from to-gradient-to text-white text-sm font-semibold shadow hover:opacity-90 disabled:opacity-50 transition-all ripple"
                 >
                   {loading ? (
-                    <><Loader2 className="h-4 w-4 animate-spin" /> Preparing Request...</>
+                    <><Loader2 className="h-4 w-4 animate-spin" /> Sending Inquiry...</>
                   ) : (
-                    <>Submit via Gmail <ExternalLink className="h-3.5 w-3.5" /></>
+                    <>Send Inquiry <ExternalLink className="h-3.5 w-3.5" /></>
                   )}
                 </button>
               </form>

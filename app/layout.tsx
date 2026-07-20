@@ -82,7 +82,7 @@ export default function RootLayout({
   const [showRestorePrompt, setShowRestorePrompt] = useState(false);
   const { user, login, loadSession, isLoaded: authLoaded } = useAuthStore();
   const { loadDraftFromStorage, activeDraft, discardDraft } = useDraftStore();
-  const { loadLicense, isLoaded: licenseLoaded, subscriptionStatus, forceUpdate, updateVersionInfo } = useLicenseStore();
+  const { loadLicense, isLoaded: licenseLoaded, subscriptionStatus, forceUpdate, updateVersionInfo, clearLicense } = useLicenseStore();
   const [licenseChecked, setLicenseChecked] = useState(false);
   const [runningNotification, setRunningNotification] = useState<string | null>(null);
 
@@ -144,6 +144,52 @@ export default function RootLayout({
       getNotifications();
     }
   }, [user]);
+ 
+  // Background check for coupon assignment verification (Safety Revocation check)
+  useEffect(() => {
+    if (isSupabaseConfigured() && supabase && user?.email) {
+      const verifyCouponAssignment = async () => {
+        try {
+          const redeemedCode = localStorage.getItem('snagora_redeemed_coupon_code');
+          if (!redeemedCode) return;
+
+          // Query the coupon details
+          const { data: coupon, error } = await supabase
+            .from('coupons')
+            .select('*')
+            .eq('code', redeemedCode.toUpperCase())
+            .single();
+
+          // If coupon is not found in DB OR assigned_to_email is no longer the user's email, coupon has been removed/revoked!
+          if (error || !coupon || coupon.assigned_to_email?.toLowerCase() !== user.email.toLowerCase()) {
+            console.warn('Assigned coupon has been removed or reassigned! Revoking credits...');
+            
+            // Clear client license and credits locally
+            await clearLicense();
+            
+            // Set localStorage items to null
+            localStorage.removeItem('snagora_redeemed_coupon_code');
+            
+            // Reset profile credits balance on Supabase backend as well (set to null)
+            await supabase
+              .from('profiles')
+              .update({ credits_balance: null })
+              .eq('id', user.googleIdToken);
+              
+            // Reload page to apply clean state
+            window.location.reload();
+          }
+        } catch (err) {
+          console.error('Error during coupon safety check:', err);
+        }
+      };
+      
+      // Run safety check on load if online
+      if (typeof window !== 'undefined' && window.navigator.onLine) {
+        verifyCouponAssignment();
+      }
+    }
+  }, [user, clearLicense]);
 
   useEffect(() => {
     // 1. Seed IndexedDB Database

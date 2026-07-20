@@ -8,7 +8,7 @@ import { useLicenseStore } from '@/store/licenseStore';
 import {
   ArrowLeft, User, CreditCard, Sun, Moon, Shield,
   Trash2, LogOut, ChevronRight, Info, AlertTriangle,
-  Smartphone, FileText, Coins, X, Award, Terminal
+  Smartphone, FileText, Coins, X, Award, Terminal, Mail, MessageSquare
 } from 'lucide-react';
 
 export default function SettingsPage() {
@@ -76,6 +76,18 @@ export default function SettingsPage() {
           label: 'Purchase Mode',
           description: 'Buy credits, activate coupons, or upgrade',
           href: '/activate'
+        },
+        {
+          icon: Mail,
+          label: 'Contact Admin',
+          description: 'Submit support tickets or license requests',
+          href: '/activate?method=sales'
+        },
+        {
+          icon: MessageSquare,
+          label: 'Connect on WhatsApp',
+          description: 'Chat directly with support on WhatsApp',
+          href: 'https://wa.me/917020821097?text=Hi%20Snagora%20Support%2C%20I%20have%20an%20inquiry%20regarding%20my%20subscription.'
         },
       ],
     },
