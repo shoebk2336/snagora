@@ -11,7 +11,7 @@ import { checkVersion } from '@/api/licenseApi';
 import { getAppVersion } from '@/utils/deviceInfo';
 import { isOnline } from '@/api/client';
 import BottomNavigation from '@/components/BottomNavigation';
-import { Sun, Moon, RotateCcw, Play, CheckCircle, Shield, Coins, RefreshCw } from 'lucide-react';
+import { Sun, Moon, RotateCcw, Play, CheckCircle, Shield, Coins, RefreshCw, ShieldAlert } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '@/utils/supabase';
 import { validateLicense } from '@/api/licenseApi';
 
@@ -84,6 +84,7 @@ export default function RootLayout({
   const { loadDraftFromStorage, activeDraft, discardDraft } = useDraftStore();
   const { loadLicense, isLoaded: licenseLoaded, subscriptionStatus, forceUpdate, updateVersionInfo } = useLicenseStore();
   const [licenseChecked, setLicenseChecked] = useState(false);
+  const [runningNotification, setRunningNotification] = useState<string | null>(null);
 
   // License gate screens that bypass all checks
   const licenseGateRoutes = ['/auth', '/activate', '/update-required', '/license-expired', '/login', '/'];
@@ -115,6 +116,34 @@ export default function RootLayout({
       }
     }
   }, [user, pathname, router, dbReady, licenseChecked, subscriptionStatus, forceUpdate, isGateRoute]);
+
+  // Load system notifications from Supabase notifications table
+  useEffect(() => {
+    if (isSupabaseConfigured() && supabase) {
+      const getNotifications = async () => {
+        try {
+          const emailFilter = user?.email ? `target_user_email.eq.${user.email.toLowerCase()}` : '';
+          let query = supabase
+            .from('notifications')
+            .select('content')
+            .or(`target_type.eq.broadcast${emailFilter ? `,${emailFilter}` : ''}`)
+            .order('created_at', { ascending: false })
+            .limit(1);
+
+          const { data, error } = await query;
+          if (error) throw error;
+          if (data && data.length > 0) {
+            setRunningNotification(data[0].content);
+          } else {
+            setRunningNotification(null);
+          }
+        } catch (err) {
+          console.warn('Failed to load notifications:', err);
+        }
+      };
+      getNotifications();
+    }
+  }, [user]);
 
   useEffect(() => {
     // 1. Seed IndexedDB Database
@@ -261,6 +290,32 @@ export default function RootLayout({
               </button>
             </div>
           </header>
+
+          {/* Locked Status Global Banner */}
+          {user && (user.status === 'locked' || user.status === 'LOCKED') && !isGateRoute && (
+            <div className="bg-rose-600 dark:bg-rose-950 text-white text-[11px] font-bold py-2.5 px-4 flex items-center justify-between z-10 animate-in slide-in-from-top duration-300">
+              <div className="flex items-center gap-2">
+                <ShieldAlert className="h-4 w-4 shrink-0 text-white" />
+                <span>App is locked. Contact Admin.</span>
+              </div>
+              <button
+                onClick={() => router.push('/activate?method=sales')}
+                className="bg-white/25 hover:bg-white/35 active:scale-95 text-white text-[10px] px-2.5 py-1 rounded-lg font-black transition-all select-none cursor-pointer"
+              >
+                Contact Admin
+              </button>
+            </div>
+          )}
+
+          {/* Running System Notification Ticker */}
+          {runningNotification && !isGateRoute && (
+            <div className="ticker-wrap select-none">
+              <div className="ticker">
+                <span className="ticker-item">⚡ Announcement: {runningNotification}</span>
+                <span className="ticker-item">⚡ Announcement: {runningNotification}</span>
+              </div>
+            </div>
+          )}
 
           {/* Page contents slot */}
           <main className="flex-1 flex flex-col overflow-hidden relative min-h-0">

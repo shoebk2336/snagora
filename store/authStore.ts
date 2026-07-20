@@ -28,6 +28,7 @@ export interface User {
   designation?: string;
   googleIdToken?: string;
   googleProfile?: GoogleProfile;
+  status?: 'active' | 'locked';
 }
 
 interface AuthState {
@@ -48,6 +49,7 @@ interface AuthState {
   setActivated: () => Promise<void>;
   loadSession: () => Promise<User | null>;
   syncSupabaseSession: (supabaseUser: any) => Promise<void>;
+  toggleStatus: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -55,6 +57,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isLoaded: false,
   login: async (name, role, idToken, googleProfile) => {
     const existing = get().user;
+    let initialStatus = existing?.status || 'active';
+    if (typeof window !== 'undefined') {
+      const override = localStorage.getItem('snagora_lock_override');
+      if (override === 'locked' || override === 'active') {
+        initialStatus = override as any;
+      }
+    }
     const user: User = {
       ...existing,
       name,
@@ -62,6 +71,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       googleIdToken: idToken || existing?.googleIdToken,
       registrationStatus: existing?.registrationStatus || 'unregistered',
       googleProfile: googleProfile || existing?.googleProfile,
+      status: initialStatus,
     };
     await secureStore('inspection_user', user);
     set({ user });
@@ -94,6 +104,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       registeredAt: Date.now(),
       registrationStatus: 'registered',
       googleProfile: existing?.googleProfile,
+      status: existing?.status || 'active',
     };
     await secureStore('inspection_user', user);
     set({ user });
@@ -111,12 +122,51 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   loadSession: async () => {
     try {
       let user = await secureRetrieve<User>('inspection_user');
+      if (user && !user.status) {
+        user.status = 'active';
+      }
+
+      // Apply local simulation override if present (for testing banner)
+      if (user && typeof window !== 'undefined') {
+        const override = localStorage.getItem('snagora_lock_override');
+        if (override === 'locked' || override === 'active') {
+          user.status = override as any;
+        }
+      }
       
       // If Supabase is configured, check if we have a current session to keep in sync
       if (isSupabaseConfigured() && supabase) {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           const sUser = session.user;
+          let backendStatus: 'active' | 'locked' = user?.status || 'active';
+          let backendRole = user?.role || 'Inspector';
+          
+          try {
+            const { data: dbProfile } = await supabase
+              .from('profiles')
+              .select('status, role')
+              .eq('id', sUser.id)
+              .single();
+            if (dbProfile) {
+              const statusStr = String(dbProfile.status).toLowerCase();
+              backendStatus = (statusStr === 'locked' || statusStr === 'inactive') ? 'locked' : 'active';
+              if (dbProfile.role) {
+                backendRole = (dbProfile.role.charAt(0).toUpperCase() + dbProfile.role.slice(1)) as UserRole;
+              }
+            }
+          } catch (err) {
+            console.warn('Failed to fetch backend profile status:', err);
+          }
+
+          // Apply local simulator override if present
+          if (typeof window !== 'undefined') {
+            const override = localStorage.getItem('snagora_lock_override');
+            if (override === 'locked' || override === 'active') {
+              backendStatus = override as any;
+            }
+          }
+
           const name = sUser.user_metadata?.full_name || sUser.user_metadata?.name || user?.name || sUser.email?.split('@')[0] || 'User';
           user = {
             ...user,
@@ -124,7 +174,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             email: sUser.email || user?.email,
             googleIdToken: sUser.id,
             registrationStatus: user?.registrationStatus || 'unregistered',
-            role: user?.role || 'Inspector',
+            role: backendRole,
+            status: backendStatus,
             googleProfile: {
               googleIdToken: session.access_token || sUser.id,
               email: sUser.email || '',
@@ -148,13 +199,43 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   syncSupabaseSession: async (supabaseUser) => {
     if (!supabaseUser) return;
     const existing = get().user;
+    let backendStatus: 'active' | 'locked' = existing?.status || 'active';
+    let backendRole = existing?.role || 'Inspector';
+
+    if (isSupabaseConfigured() && supabase) {
+      try {
+        const { data: dbProfile } = await supabase
+          .from('profiles')
+          .select('status, role')
+          .eq('id', supabaseUser.id)
+          .single();
+        if (dbProfile) {
+          const statusStr = String(dbProfile.status).toLowerCase();
+          backendStatus = (statusStr === 'locked' || statusStr === 'inactive') ? 'locked' : 'active';
+          if (dbProfile.role) {
+            backendRole = (dbProfile.role.charAt(0).toUpperCase() + dbProfile.role.slice(1)) as UserRole;
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to fetch backend profile status during sync:', err);
+      }
+    }
+
+    // Apply local simulator override if present
+    if (typeof window !== 'undefined') {
+      const override = localStorage.getItem('snagora_lock_override');
+      if (override === 'locked' || override === 'active') {
+        backendStatus = override as any;
+      }
+    }
+
     const name = supabaseUser.user_metadata?.full_name || supabaseUser.user_metadata?.name || existing?.name || supabaseUser.email?.split('@')[0] || 'User';
     const email = supabaseUser.email || existing?.email;
     const user: User = {
       ...existing,
       name,
       email,
-      role: existing?.role || 'Inspector',
+      role: backendRole,
       googleIdToken: supabaseUser.id,
       registrationStatus: existing?.registrationStatus || 'unregistered',
       googleProfile: {
@@ -163,8 +244,40 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         name,
         picture: supabaseUser.user_metadata?.avatar_url || supabaseUser.user_metadata?.picture,
         authenticatedAt: new Date().toISOString()
-      }
+      },
+      status: backendStatus,
     };
+    await secureStore('inspection_user', user);
+    set({ user });
+  },
+  toggleStatus: async () => {
+    const existing = get().user;
+    if (!existing) return;
+    const newStatus = existing.status === 'locked' ? 'active' : 'locked';
+
+    // Store simulator override in localStorage so it persists across pages/refresh
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('snagora_lock_override', newStatus);
+    }
+
+    const user: User = {
+      ...existing,
+      status: newStatus,
+    };
+
+    // If Supabase is active, update the real database profile status as well
+    if (isSupabaseConfigured() && supabase && existing.googleIdToken) {
+      try {
+        const dbStatus = newStatus === 'locked' ? 'LOCKED' : 'ACTIVE';
+        await supabase
+          .from('profiles')
+          .update({ status: dbStatus })
+          .eq('id', existing.googleIdToken);
+      } catch (err) {
+        console.warn('Failed to update Supabase status on toggle:', err);
+      }
+    }
+
     await secureStore('inspection_user', user);
     set({ user });
   },

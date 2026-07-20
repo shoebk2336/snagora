@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useLicenseStore } from '@/store/licenseStore';
 import { activateWithCoupon } from '@/api/licenseApi';
@@ -14,11 +14,26 @@ import {
 type ActivationMethod = 'choose' | 'coupon' | 'paypal' | 'sales';
 
 export default function ActivatePage() {
+  return (
+    <Suspense fallback={
+      <div className="flex-1 flex flex-col items-center justify-center p-6 space-y-4 bg-background h-full w-full">
+        <Loader2 className="h-8 w-8 animate-spin text-accent" />
+        <p className="text-xs text-slate-500 font-medium font-mono uppercase tracking-wider">Loading activation options...</p>
+      </div>
+    }>
+      <ActivateContent />
+    </Suspense>
+  );
+}
+
+function ActivateContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, setActivated } = useAuthStore();
   const { storeLicense } = useLicenseStore();
 
-  const [method, setMethod] = useState<ActivationMethod>('choose');
+  const initialMethod = (searchParams.get('method') as ActivationMethod) || 'choose';
+  const [method, setMethod] = useState<ActivationMethod>(initialMethod);
   const [couponCode, setCouponCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -63,6 +78,9 @@ export default function ActivatePage() {
       }
 
       await storeLicense(result.license);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('snagora_redeemed_coupon_code', couponCode.trim().toUpperCase());
+      }
       await setActivated();
       setSuccess(result.message);
 
@@ -112,19 +130,14 @@ export default function ActivatePage() {
     }
   };
 
-  // Option 3: Contact Sales (Gmail check + prefilled mailto composer)
+  // Option 3: Contact Admin (Prefilled mailto composer)
   const handleContactSales = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
-    if (!salesEmail.trim() || !salesEmail.toLowerCase().endsWith('@gmail.com')) {
-      setError('Please connect using a valid Gmail address (ending in @gmail.com).');
-      return;
-    }
-
     if (!salesMessage.trim()) {
-      setError('Please enter a message for our sales team.');
+      setError('Please enter a message.');
       return;
     }
 
@@ -132,9 +145,10 @@ export default function ActivatePage() {
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
 
-      // Open user's default Gmail client via mailto
-      const mailtoUrl = `mailto:sales@snagora.io?subject=Sales Inquiry from ${encodeURIComponent(salesName)}&body=${encodeURIComponent(
-        `Name: ${salesName}\nGmail: ${salesEmail}\n\nMessage:\n${salesMessage}`
+      // Open user's default email client via mailto
+      const recipients = 'shoebk478@gmail.com,snagora.app@gmail.com,snag.support@gmail.com';
+      const mailtoUrl = `mailto:${recipients}?subject=Admin Inquiry from ${encodeURIComponent(salesName)}&body=${encodeURIComponent(
+        `Name: ${salesName}\nEmail: ${user.email || ''}\n\nMessage:\n${salesMessage}`
       )}`;
       window.open(mailtoUrl, '_blank');
 
@@ -254,7 +268,7 @@ export default function ActivatePage() {
                 </div>
               </button>
 
-              {/* Option 3: Contact Sales */}
+              {/* Option 3: Contact Admin */}
               <button
                 onClick={() => setMethod('sales')}
                 className="w-full p-4 rounded-3xl border border-border bg-surface hover:bg-slate-50 dark:hover:bg-slate-800 text-left shadow-sm transition-all group ripple"
@@ -264,9 +278,9 @@ export default function ActivatePage() {
                     <Mail className="h-6 w-6" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-sm font-bold text-foreground">Contact Sales Team</h3>
+                    <h3 className="text-sm font-bold text-foreground">Contact Admin</h3>
                     <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
-                      Submit an inquiry via Gmail to set up custom team licensing plans
+                      Submit an inquiry via Gmail to request license activation
                     </p>
                   </div>
                   <ArrowRight className="h-5 w-5 text-slate-400 group-hover:text-accent transition-colors" />
@@ -402,8 +416,8 @@ export default function ActivatePage() {
                     <Mail className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-foreground">Inquire Sales Team</h3>
-                    <p className="text-[10px] text-slate-400">Connect with Gmail to request license keys</p>
+                    <h3 className="text-sm font-bold text-foreground">Send Inquiry</h3>
+                    <p className="text-[10px] text-slate-400">Submit an inquiry to request license activation</p>
                   </div>
                 </div>
 
@@ -417,19 +431,6 @@ export default function ActivatePage() {
                     placeholder="Full Name"
                     className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-background px-3.5 py-2.5 text-xs text-foreground focus:border-accent focus:outline-none"
                   />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Gmail Address</label>
-                  <input
-                    type="email"
-                    required
-                    value={salesEmail}
-                    onChange={e => setSalesEmail(e.target.value)}
-                    placeholder="yourname@gmail.com"
-                    className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-background px-3.5 py-2.5 text-xs text-foreground focus:border-accent focus:outline-none"
-                  />
-                  <span className="text-[9px] text-slate-400 block px-0.5">Please provide a Gmail address to connect</span>
                 </div>
 
                 <div className="space-y-1">

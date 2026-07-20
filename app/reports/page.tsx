@@ -647,6 +647,25 @@ export default function ReportsPage() {
         <h2 className="text-lg font-black text-foreground">Export Audits</h2>
       </div>
 
+      {/* Locked Alert Box */}
+      {(user.status === 'locked' || user.status === 'LOCKED') && (
+        <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-between text-rose-600 dark:text-rose-450 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="flex gap-3">
+            <ShieldAlert className="h-5 w-5 flex-shrink-0 text-rose-500" />
+            <div className="text-left">
+              <span className="font-bold text-xs block text-rose-800 dark:text-rose-400">App is locked</span>
+              <span className="text-[10px] text-rose-700/80 dark:text-slate-350 block mt-0.5">Please contact Admin.</span>
+            </div>
+          </div>
+          <button
+            onClick={() => router.push('/activate?method=sales')}
+            className="bg-rose-600 hover:bg-rose-500 active:scale-95 text-white text-[10px] px-3 py-1.5 rounded-xl font-bold transition-all select-none cursor-pointer"
+          >
+            Contact Admin
+          </button>
+        </div>
+      )}
+
       {/* Filter Parameters Card */}
       <div className="p-4 rounded-3xl border border-border bg-surface shadow-sm space-y-4">
         <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
@@ -792,7 +811,7 @@ export default function ReportsPage() {
           <button
             type="button"
             onClick={handleExportExcel}
-            disabled={exporting || !canExportReport()}
+            disabled={exporting || !canExportReport() || user.status === 'locked' || user.status === 'LOCKED'}
             className="flex flex-col items-center justify-center p-4 rounded-3xl border border-border bg-surface hover:bg-slate-50 dark:hover:bg-slate-800 text-center font-bold text-xs space-y-2.5 shadow-sm text-foreground disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface ripple"
           >
             <div className="h-11 w-11 rounded-full bg-accent-surface flex items-center justify-center text-accent">
@@ -805,7 +824,7 @@ export default function ReportsPage() {
           <button
             type="button"
             onClick={handleExportPDF}
-            disabled={exporting || !canExportReport()}
+            disabled={exporting || !canExportReport() || user.status === 'locked' || user.status === 'LOCKED'}
             className="flex flex-col items-center justify-center p-4 rounded-3xl border border-border bg-surface hover:bg-slate-50 dark:hover:bg-slate-800 text-center font-bold text-xs space-y-2.5 shadow-sm text-foreground disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface ripple"
           >
             <div className="h-11 w-11 rounded-full bg-accent-surface flex items-center justify-center text-accent">

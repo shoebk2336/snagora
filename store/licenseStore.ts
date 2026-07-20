@@ -239,6 +239,8 @@ export const canCreateInspection = () => {
 
 export const canExportReport = () => {
   const state = useLicenseStore.getState();
+  const authState = useAuthStore.getState();
+  if (authState.user?.status === 'locked' || authState.user?.status === 'LOCKED') return false;
   if (state.isExpired || state.subscriptionStatus !== 'active') return false;
   if (state.isUnlimited) return true;
   return state.reportCreditsRemaining >= 5;
