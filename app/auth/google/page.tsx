@@ -109,6 +109,28 @@ export default function GoogleSignInPage() {
         // 1. Set login session
         await login(formData.fullName || googleName, 'Inspector', mockIdToken, googleProfile);
 
+        // Best-effort: Write profile to Supabase database
+        // May fail due to RLS policies — that's OK, admin can create profiles
+        if (isSupabaseConfigured() && supabase) {
+          try {
+            const { error: insertError } = await supabase
+              .from('profiles')
+              .insert({
+                id: sUser.id,
+                full_name: formData.fullName || googleName,
+                email: formData.email || email,
+                role: 'inspector',
+                status: 'ACTIVE',
+                credits_balance: 0,
+              });
+            if (insertError && insertError.code !== '23505') {
+              console.warn('Profile insert skipped (RLS policy):', insertError.message, insertError.code);
+            }
+          } catch (profileErr) {
+            console.warn('Profile insert failed (non-fatal):', profileErr);
+          }
+        }
+
         // 2. Save registration data
         await setRegistration({
           email: formData.email || email,
@@ -134,7 +156,27 @@ export default function GoogleSignInPage() {
         localStorage.removeItem('temp_signup_form');
         router.push('/activate');
       } else {
-        // Login Flow
+        // Login Flow - Best-effort profile creation
+        if (isSupabaseConfigured() && supabase) {
+          try {
+            const { error: insertError } = await supabase
+              .from('profiles')
+              .insert({
+                id: sUser.id,
+                full_name: googleName,
+                email: email || '',
+                role: 'inspector',
+                status: 'ACTIVE',
+                credits_balance: 0,
+              });
+            if (insertError && insertError.code !== '23505') {
+              console.warn('Profile insert skipped (RLS policy):', insertError.message, insertError.code);
+            }
+          } catch (profileErr) {
+            console.warn('Profile insert failed (non-fatal):', profileErr);
+          }
+        }
+
         await login(googleName, 'Inspector', mockIdToken, googleProfile);
         
         // Sync googleProfile on login

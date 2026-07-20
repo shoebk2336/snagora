@@ -92,22 +92,32 @@ export default function HomePage() {
           <div className="absolute top-10 left-10 w-44 h-44 bg-white/10 rounded-full blur-3xl animate-pulse" />
           <div className="absolute bottom-20 right-10 w-60 h-60 bg-white/10 rounded-full blur-3xl animate-pulse duration-3000" />
           
-          <div className="flex-1 flex flex-col justify-center items-center text-center space-y-8">
-            {/* Pulsing Animated App Logo */}
+          {/* Top: Snagora Text Logo */}
+          <div className="flex flex-col items-center pt-4 z-10 select-none">
+            <h2 className="text-4xl font-extrabold tracking-tight text-white drop-shadow-sm flex items-center">
+              <span>Snag</span>
+              <span style={{ color: '#F5A623' }}>o</span>
+              <span>ra</span>
+            </h2>
+            <span className="text-[9px] font-bold uppercase tracking-[0.22em] text-white/80 mt-1">
+              Snag <span style={{ color: '#F5A623' }}>•</span> Inspect <span style={{ color: '#F5A623' }}>•</span> Resolve
+            </span>
+          </div>
+
+          <div className="flex-1 flex flex-col justify-center items-center text-center space-y-6">
+            {/* Center: Snagora Icon Logo */}
             <div className="relative animate-bounce duration-1000">
-              <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-white text-accent shadow-2xl border border-white/20 transform hover:scale-105 transition-transform">
-                <ClipboardCheck className="h-12 w-12 text-gradient-from" />
-              </div>
-              <div className="absolute -bottom-1.5 -right-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-white text-gradient-via shadow-md border-2 border-gradient-from">
-                <Shield className="h-4 w-4" />
+              <div className="flex h-36 w-36 items-center justify-center rounded-3xl bg-white/95 shadow-2xl border border-white/20 backdrop-blur-sm">
+                <img 
+                  src="/snagora-icon.png" 
+                  alt="Snagora Icon" 
+                  className="h-28 w-28 object-contain"
+                />
               </div>
             </div>
 
-            {/* App Name and Description */}
+            {/* App Description */}
             <div className="space-y-3">
-              <h1 className="text-4.5xl font-black tracking-wider text-white drop-shadow-md select-none animate-pulse">
-                Snagora
-              </h1>
               <p className="text-[10px] font-extrabold uppercase tracking-widest text-white/95 bg-white/15 px-4 py-1.5 rounded-full border border-white/25">
                 Offline Inspection & Reporting Tool
               </p>
@@ -118,7 +128,7 @@ export default function HomePage() {
           </div>
 
           {/* Bottom Button and Countdown */}
-          <div className="space-y-4 w-full">
+          <div className="space-y-4 w-full z-10">
             <button
               type="button"
               onClick={handleStart}
@@ -141,21 +151,19 @@ export default function HomePage() {
       {/* Main Landing Content */}
       <div className="flex-1 flex flex-col justify-center items-center text-center space-y-8 z-10 px-6 py-10">
         
-        {/* App Logo */}
+        {/* Snagora Icon Logo centered */}
         <div className="relative">
-          <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-gradient-from via-gradient-via to-gradient-to shadow-xl shadow-accent-glow border-2 border-accent-light/20 text-white">
-            <ClipboardCheck className="h-10 w-10" />
-          </div>
-          <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-gradient-via border-2 border-background shadow-md">
-            <Shield className="h-3.5 w-3.5 text-white" />
+          <div className="flex h-32 w-32 items-center justify-center rounded-3xl bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 shadow-xl shadow-accent-glow/20 border-2 border-accent-light/20">
+            <img 
+              src="/snagora-icon.png" 
+              alt="Snagora Icon" 
+              className="h-24 w-24 object-contain"
+            />
           </div>
         </div>
 
         {/* Text Details */}
         <div className="space-y-3">
-          <h1 className="text-3.5xl font-black tracking-tight text-foreground bg-gradient-to-r from-gradient-from via-gradient-via to-gradient-to bg-clip-text text-transparent filter drop-shadow-[0_2px_10px_var(--accent-glow)]">
-            Snagora
-          </h1>
           <p className="text-[10px] font-extrabold uppercase tracking-widest text-accent bg-accent-surface px-3 py-1 rounded-full border border-accent-light/30">
             Offline Inspection & Reporting Tool
           </p>

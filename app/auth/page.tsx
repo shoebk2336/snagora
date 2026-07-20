@@ -12,29 +12,7 @@ import {
 export default function RegisterPage() {
   const router = useRouter();
 
-  // Trigger signup flow automatically on mount
-  useEffect(() => {
-    const triggerSignup = async () => {
-      setLoading(true);
-      if (isSupabaseConfigured() && supabase) {
-        try {
-          const { error: authError } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-              redirectTo: getOauthRedirectUrl('/auth/google?flow=signup'),
-            },
-          });
-          if (authError) throw authError;
-        } catch (err: any) {
-          setError(err.message || 'Supabase Google Auth failed.');
-          setLoading(false);
-        }
-      } else {
-        router.push('/auth/google?flow=signup');
-      }
-    };
-    triggerSignup();
-  }, [router]);
+
 
   // Form states
   const [fullName, setFullName] = useState('');

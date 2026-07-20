@@ -38,29 +38,32 @@ function CoinCreditsFetcher() {
           transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
         }}
       >
-        {/* FRONT: Gold Coin Image (No black background, scaled to crop outer edges) */}
+        {/* FRONT: CSS Gold Coin */}
         <div 
-          className="absolute inset-0 w-full h-full rounded-full overflow-hidden flex items-center justify-center border border-amber-500/30 shadow-md bg-transparent"
+          className="absolute inset-0 w-full h-full rounded-full flex items-center justify-center bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-500 border-2 border-amber-200/50 shadow-md"
           style={{ backfaceVisibility: 'hidden' }}
         >
-          <img 
-            src="/coin.jpg" 
-            className="w-full h-full object-cover scale-[1.20] select-none" 
-            alt="Gold Coin Front"
-          />
+          {/* Inner ring for coin aesthetic */}
+          <div className="w-6 h-6 rounded-full border border-amber-100/35 flex items-center justify-center">
+            {/* Center golden dot */}
+            <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-br from-yellow-100 to-amber-200 shadow-inner" />
+          </div>
         </div>
 
-        {/* BACK: Golden Circle with Number */}
+        {/* BACK: CSS Gold Coin with Number Overlay */}
         <div 
-          className="absolute inset-0 w-full h-full rounded-full flex items-center justify-center bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 border border-amber-300 shadow-md bg-transparent"
+          className="absolute inset-0 w-full h-full rounded-full flex items-center justify-center bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-500 border-2 border-amber-200/50 shadow-md"
           style={{
             backfaceVisibility: 'hidden',
             transform: 'rotateY(180deg)',
           }}
         >
-          <span className="text-[10px] font-black text-white font-mono tracking-tighter drop-shadow-sm select-none">
-            {displayCount}
-          </span>
+          {/* Inner ring for coin aesthetic */}
+          <div className="w-6 h-6 rounded-full border border-amber-100/35 flex items-center justify-center">
+            <span className="text-[10px] font-black text-amber-950 font-mono tracking-tighter drop-shadow-sm select-none">
+              {displayCount}
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -239,9 +242,11 @@ export default function RootLayout({
           
           {/* Global Header */}
           <header className="flex h-14 items-center justify-between border-b border-border bg-surface px-4 z-10 sticky top-0">
-            <span className="font-bold text-base text-accent tracking-tight flex items-center gap-1.5">
+            <span className="font-black text-lg tracking-tight flex items-center gap-1.5 select-none">
               <span className="w-2.5 h-2.5 rounded-full bg-accent animate-pulse" />
-              Snagora
+              <span className="text-foreground font-black">
+                Snag<span style={{ color: '#F5A623' }}>o</span>ra
+              </span>
             </span>
             <div className="flex items-center gap-2">
               {user && (
