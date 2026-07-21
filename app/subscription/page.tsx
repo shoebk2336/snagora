@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useLicenseStore } from '@/store/licenseStore';
 import { activateWithCoupon } from '@/api/licenseApi';
 import { supabase, isSupabaseConfigured } from '@/utils/supabase';
+import { logger } from '@/utils/logger';
 import type { License } from '@/api/mockResponses';
 import {
   AlertCircle, Loader2, ArrowLeft, Ticket, Trophy
@@ -68,7 +69,7 @@ export default function SubscriptionPage() {
               }
             }
           } catch (err) {
-            console.warn('Failed to query coupons data:', err);
+            logger.warn('Failed to query coupons data:', err);
           }
         };
         fetchCouponsData();

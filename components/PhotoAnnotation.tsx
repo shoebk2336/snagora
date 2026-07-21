@@ -5,6 +5,7 @@ import {
   ArrowUpRight, Square, Circle, Edit3, Type, Hash, 
   RotateCcw, RotateCw, Save, X, Trash2, Maximize2, Move
 } from 'lucide-react';
+import { logger } from '@/utils/logger';
 
 interface PhotoAnnotationProps {
   originalUrl: string;
@@ -93,7 +94,7 @@ export default function PhotoAnnotation({
         if (loaded.shapes) setShapes(loaded.shapes);
         if (loaded.numberCount) setNumberCount(loaded.numberCount);
       } catch (e) {
-        console.error('Failed to parse initial annotations', e);
+        logger.error('Failed to parse initial annotations', e);
       }
     }
   }, [originalUrl, initialAnnotationsJson]);
