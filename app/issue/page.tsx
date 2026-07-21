@@ -13,6 +13,7 @@ import {
   ArrowLeft, Save, MapPin, Sparkles, Plus, 
   HelpCircle, Mic, CheckCircle, Navigation, ExternalLink, X, ShieldOff 
 } from 'lucide-react';
+import { logger } from '@/utils/logger';
 
 const CATEGORIES = [
   'Civil', 'Carpentry', 'Electrical', 'HVAC', 'Mechanical', 'Plumbing', 
@@ -190,7 +191,7 @@ export default function IssuePage() {
         handleFieldChange('gps', coords);
       },
       (err) => {
-        console.error('GPS Geolocation error', err);
+        logger.error('GPS Geolocation error', err);
         alert(`Failed to capture GPS: ${err.message}. You can still save the inspection.`);
         setGpsLoading(false);
       },

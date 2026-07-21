@@ -15,6 +15,7 @@ import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { useLicenseStore, canExportReport } from '@/store/licenseStore';
+import { logger } from '@/utils/logger';
 
 const convertBlobToBase64 = (blob: Blob): Promise<string> => new Promise((resolve, reject) => {
   const reader = new FileReader();
@@ -213,7 +214,7 @@ export default function ReportsPage() {
               });
               hasImage = true;
             } catch (e) {
-              console.warn(`Failed to embed photo ${i + 1} for issue`, issue.id, e);
+              logger.warn(`Failed to embed photo ${i + 1} for issue`, issue.id, e);
             }
           }
         }
@@ -274,7 +275,7 @@ export default function ReportsPage() {
             savedDirectly = true;
             alert(`Excel file saved successfully to your phone's Downloads folder as:\n${fileName}`);
           } catch (writeErr) {
-            console.warn('Could not write directly to Downloads folder, falling back to Share sheet:', writeErr);
+            logger.warn('Could not write directly to Downloads folder, falling back to Share sheet:', writeErr);
           }
 
           if (!savedDirectly) {
@@ -289,7 +290,7 @@ export default function ReportsPage() {
             });
           }
         } catch (shareErr) {
-          console.error('Failed to share file on native platform', shareErr);
+          logger.error('Failed to share file on native platform', shareErr);
           alert('Failed to save and share Excel file locally.');
         }
       } else {
@@ -306,7 +307,7 @@ export default function ReportsPage() {
       // Successfully generated, consume one credit
       await consumeCredit();
     } catch (e) {
-      console.error(e);
+      logger.error('Failed to export Excel:', e);
       alert('Failed to generate Excel sheet.');
     } finally {
       setExporting(false);
@@ -509,7 +510,7 @@ export default function ReportsPage() {
               const label = isLeftAnnotated ? 'Annotated Markup' : 'Photo Capture';
               pdf.text(label, 15 + photoW / 2, currentPhotoY + photoH + 4, { align: 'center' });
             } catch (e) {
-              console.error('Failed to add left photo to PDF', e);
+              logger.error('Failed to add left photo to PDF', e);
             }
 
             // Draw right photo
@@ -523,7 +524,7 @@ export default function ReportsPage() {
                 const label = isRightAnnotated ? 'Annotated Markup' : 'Photo Capture';
                 pdf.text(label, 110 + photoW / 2, currentPhotoY + photoH + 4, { align: 'center' });
               } catch (e) {
-                console.error('Failed to add right photo to PDF', e);
+                logger.error('Failed to add right photo to PDF', e);
               }
             }
 
@@ -598,7 +599,7 @@ export default function ReportsPage() {
             savedDirectly = true;
             alert(`PDF file saved successfully to your phone's Downloads folder as:\n${pdfFileName}`);
           } catch (writeErr) {
-            console.warn('Could not write directly to Downloads folder, falling back to Share sheet:', writeErr);
+            logger.warn('Could not write directly to Downloads folder, falling back to Share sheet:', writeErr);
           }
 
           if (!savedDirectly) {
@@ -613,7 +614,7 @@ export default function ReportsPage() {
             });
           }
         } catch (shareErr) {
-          console.error('Failed to share file on native platform', shareErr);
+          logger.error('Failed to share file on native platform', shareErr);
           alert('Failed to save and share PDF file locally.');
         }
       } else {
@@ -630,7 +631,7 @@ export default function ReportsPage() {
       // Successfully generated, consume one credit
       await consumeCredit();
     } catch (err) {
-      console.error(err);
+      logger.error('Failed to export PDF:', err);
       alert('Failed to generate PDF document.');
     } finally {
       setExporting(false);

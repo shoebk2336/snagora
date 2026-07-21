@@ -10,6 +10,7 @@ import {
   Clock, Plus, X, Edit, Trash2,
   Building as BuildingIcon
 } from 'lucide-react';
+import { logger } from '@/utils/logger';
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
@@ -95,7 +96,7 @@ export default function DashboardPage() {
       resetForm();
       setShowCreateModal(false);
     } catch (err) {
-      console.error('Failed to create project:', err);
+      logger.error('Failed to create project:', err);
       alert('Failed to create project. Please try again.');
     } finally {
       setCreating(false);
@@ -124,7 +125,7 @@ export default function DashboardPage() {
       });
       setProjectToEdit(null);
     } catch (err) {
-      console.error('Failed to update project:', err);
+      logger.error('Failed to update project:', err);
       alert('Failed to save project updates.');
     } finally {
       setSavingEdit(false);
@@ -180,7 +181,7 @@ export default function DashboardPage() {
       
       setProjectToDelete(null);
     } catch (err) {
-      console.error('Failed to delete project:', err);
+      logger.error('Failed to delete project:', err);
       alert('Failed to delete project.');
     } finally {
       setDeleting(false);

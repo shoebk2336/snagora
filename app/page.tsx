@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useLicenseStore } from '@/store/licenseStore';
 import { LogIn, UserPlus, Shield, ClipboardCheck, ArrowRight } from 'lucide-react';
 import { supabase, isSupabaseConfigured, getOauthRedirectUrl } from '@/utils/supabase';
+import { logger } from '@/utils/logger';
 
 export default function HomePage() {
   const router = useRouter();
@@ -55,7 +56,7 @@ export default function HomePage() {
         });
         if (error) throw error;
       } catch (err) {
-        console.error('Supabase Google Sign-in failed:', err);
+        logger.error('Supabase Google Sign-in failed:', err);
         router.push('/auth/google?flow=login');
       }
     } else {
@@ -74,7 +75,7 @@ export default function HomePage() {
         });
         if (error) throw error;
       } catch (err) {
-        console.error('Supabase Google Sign-up failed:', err);
+        logger.error('Supabase Google Sign-up failed:', err);
         router.push('/auth/google?flow=signup');
       }
     } else {
