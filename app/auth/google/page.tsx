@@ -7,6 +7,7 @@ import { collectDeviceInfo } from '@/utils/deviceInfo';
 import { Loader2 } from 'lucide-react';
 import { secureStore, secureRetrieve } from '@/utils/crypto';
 import { supabase, isSupabaseConfigured } from '@/utils/supabase';
+import { logger } from '@/utils/logger';
 
 export default function GoogleSignInPage() {
   const router = useRouter();
