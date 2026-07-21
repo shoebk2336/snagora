@@ -5,6 +5,7 @@ import { Camera, Image as ImageIcon, Trash2, RefreshCw, Plus, Loader2, X, AlertC
 import { Camera as CapCamera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Capacitor } from '@capacitor/core';
 import imageCompression from 'browser-image-compression';
+import { logger } from '@/utils/logger';
 
 interface CameraCaptureProps {
   photoUrls: { id: string; originalUrl: string; annotatedUrl: string; annotationsJson: string }[];
@@ -35,7 +36,7 @@ export default function CameraCapture({ photoUrls, onChange, onAnnotateTapped }:
         reader.readAsDataURL(compressedFile);
       });
     } catch (e) {
-      console.error('Compression failed, using original', e);
+      logger.error('Compression failed, using original', e);
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onloadend = () => resolve(reader.result as string);
@@ -109,7 +110,7 @@ export default function CameraCapture({ photoUrls, onChange, onAnnotateTapped }:
         setCompressing(false);
       }
     } catch (err) {
-      console.warn('Native camera failed, falling back to web camera trigger', err);
+      logger.warn('Native camera failed, falling back to web camera trigger', err);
       setShowSourceSelector(false);
       cameraInputRef.current?.click();
     }
@@ -152,7 +153,7 @@ export default function CameraCapture({ photoUrls, onChange, onAnnotateTapped }:
         setCompressing(false);
       }
     } catch (err) {
-      console.warn('Native gallery failed, falling back to web file explorer', err);
+      logger.warn('Native gallery failed, falling back to web file explorer', err);
       setShowSourceSelector(false);
       galleryInputRef.current?.click();
     }
@@ -189,7 +190,7 @@ export default function CameraCapture({ photoUrls, onChange, onAnnotateTapped }:
         setCompressing(false);
       }
     } catch (e) {
-      console.warn('Retake native failed, triggering web camera', e);
+      logger.warn('Retake native failed, triggering web camera', e);
       cameraInputRef.current?.click();
     }
   };

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { db } from '@/database/db';
+import { logger } from '@/utils/logger';
 
 export interface DraftIssue {
   id: string; // Temp issue ID
@@ -82,7 +83,7 @@ export const useDraftStore = create<DraftState>((set, get) => ({
         set({ activeDraft: draft });
         return draft;
       } catch (e) {
-        console.error('Failed to parse draft from localStorage', e);
+        logger.error('Failed to parse draft from localStorage', e);
       }
     }
     return null;
