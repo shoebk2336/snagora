@@ -648,7 +648,7 @@ export default function ReportsPage() {
       </div>
 
       {/* Locked Alert Box */}
-      {(user.status === 'locked' || user.status === 'LOCKED') && (
+      {((user.status as string) === 'locked' || (user.status as string) === 'LOCKED') && (
         <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-between text-rose-600 dark:text-rose-450 animate-in fade-in slide-in-from-top-2 duration-300">
           <div className="flex gap-3">
             <ShieldAlert className="h-5 w-5 flex-shrink-0 text-rose-500" />
@@ -811,7 +811,7 @@ export default function ReportsPage() {
           <button
             type="button"
             onClick={handleExportExcel}
-            disabled={exporting || !canExportReport() || user.status === 'locked' || user.status === 'LOCKED'}
+            disabled={exporting || !canExportReport() || (user.status as string) === 'locked' || (user.status as string) === 'LOCKED'}
             className="flex flex-col items-center justify-center p-4 rounded-3xl border border-border bg-surface hover:bg-slate-50 dark:hover:bg-slate-800 text-center font-bold text-xs space-y-2.5 shadow-sm text-foreground disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface ripple"
           >
             <div className="h-11 w-11 rounded-full bg-accent-surface flex items-center justify-center text-accent">
@@ -824,7 +824,7 @@ export default function ReportsPage() {
           <button
             type="button"
             onClick={handleExportPDF}
-            disabled={exporting || !canExportReport() || user.status === 'locked' || user.status === 'LOCKED'}
+            disabled={exporting || !canExportReport() || (user.status as string) === 'locked' || (user.status as string) === 'LOCKED'}
             className="flex flex-col items-center justify-center p-4 rounded-3xl border border-border bg-surface hover:bg-slate-50 dark:hover:bg-slate-800 text-center font-bold text-xs space-y-2.5 shadow-sm text-foreground disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface ripple"
           >
             <div className="h-11 w-11 rounded-full bg-accent-surface flex items-center justify-center text-accent">

@@ -121,6 +121,7 @@ export default function RootLayout({
   useEffect(() => {
     if (isSupabaseConfigured() && supabase) {
       const getNotifications = async () => {
+        if (!supabase) return;
         try {
           const emailFilter = user?.email ? `target_user_email.eq.${user.email.toLowerCase()}` : '';
           let query = supabase
@@ -149,6 +150,10 @@ export default function RootLayout({
   useEffect(() => {
     if (isSupabaseConfigured() && supabase && user?.email) {
       const verifyCouponAssignment = async () => {
+        if (!supabase) return;
+        const userEmail = user?.email;
+        if (!userEmail) return;
+
         try {
           const redeemedCode = localStorage.getItem('snagora_redeemed_coupon_code');
           if (!redeemedCode) return;
@@ -161,7 +166,7 @@ export default function RootLayout({
             .single();
 
           // If coupon is not found in DB OR assigned_to_email is no longer the user's email, coupon has been removed/revoked!
-          if (error || !coupon || coupon.assigned_to_email?.toLowerCase() !== user.email.toLowerCase()) {
+          if (error || !coupon || coupon.assigned_to_email?.toLowerCase() !== userEmail.toLowerCase()) {
             console.warn('Assigned coupon has been removed or reassigned! Revoking credits...');
             
             // Clear client license and credits locally
@@ -338,7 +343,7 @@ export default function RootLayout({
           </header>
 
           {/* Locked Status Global Banner */}
-          {user && (user.status === 'locked' || user.status === 'LOCKED') && !isGateRoute && (
+          {user && ((user.status as string) === 'locked' || (user.status as string) === 'LOCKED') && !isGateRoute && (
             <div className="bg-rose-600 dark:bg-rose-950 text-white text-[11px] font-bold py-2.5 px-4 flex items-center justify-between z-10 animate-in slide-in-from-top duration-300">
               <div className="flex items-center gap-2">
                 <ShieldAlert className="h-4 w-4 shrink-0 text-white" />

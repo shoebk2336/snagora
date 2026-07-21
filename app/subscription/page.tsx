@@ -24,7 +24,8 @@ export default function SubscriptionPage() {
 
   // Check for assigned coupon and last redeemed coupon code on mount/update
   useEffect(() => {
-    if (user?.email) {
+    const userEmail = user?.email;
+    if (userEmail) {
       if (typeof window !== 'undefined') {
         const storedCode = localStorage.getItem('snagora_redeemed_coupon_code');
         if (storedCode) {
@@ -34,12 +35,13 @@ export default function SubscriptionPage() {
 
       if (isSupabaseConfigured() && supabase) {
         const fetchCouponsData = async () => {
+          if (!supabase) return;
           try {
             // 1. Fetch assigned coupon (unused)
             const { data: assignedData, error: assignedErr } = await supabase
               .from('coupons')
               .select('*')
-              .eq('assigned_to_email', user.email.toLowerCase())
+              .eq('assigned_to_email', userEmail.toLowerCase())
               .eq('is_used', false)
               .limit(1);
             
@@ -55,7 +57,7 @@ export default function SubscriptionPage() {
               const { data: redeemedData, error: redeemedErr } = await supabase
                 .from('coupons')
                 .select('code')
-                .eq('used_by_email', user.email.toLowerCase())
+                .eq('used_by_email', userEmail.toLowerCase())
                 .eq('is_used', true)
                 .order('used_at', { ascending: false })
                 .limit(1);
@@ -75,7 +77,7 @@ export default function SubscriptionPage() {
   }, [user, license]);
 
   const handleRedeemAssignedCoupon = async () => {
-    if (!assignedCoupon) return;
+    if (!assignedCoupon || !user) return;
     setRedeeming(true);
     setMessage('');
     try {
