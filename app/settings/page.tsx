@@ -102,18 +102,6 @@ export default function SettingsPage() {
           toggle: true,
           toggleValue: theme === 'dark',
         },
-        {
-          icon: Shield,
-          label: 'Simulate Lock Profile',
-          description: ((user.status as string) === 'locked' || (user.status as string) === 'LOCKED') ? 'Locked (Features disabled)' : 'Active (Normal operations)',
-          action: async () => {
-            if ((useAuthStore.getState() as any).toggleStatus) {
-              await (useAuthStore.getState() as any).toggleStatus();
-            }
-          },
-          toggle: true,
-          toggleValue: (user.status as string) === 'locked' || (user.status as string) === 'LOCKED',
-        },
       ],
     },
     {
