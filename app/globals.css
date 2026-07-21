@@ -116,16 +116,26 @@
   --color-priority-cosmetic-fg: var(--priority-cosmetic-fg);
 }
 
+html, body {
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
-  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Safe area insets for notched devices */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* Custom transitions and scrollbar hides */

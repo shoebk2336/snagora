@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { collectDeviceInfo } from '@/utils/deviceInfo';
 import { Loader2 } from 'lucide-react';
+import { secureStore, secureRetrieve } from '@/utils/crypto';
 import { supabase, isSupabaseConfigured } from '@/utils/supabase';
 
 export default function GoogleSignInPage() {
@@ -50,7 +51,7 @@ export default function GoogleSignInPage() {
           setLoading(false);
         }
       } catch (err: any) {
-        console.error('Failed to retrieve Supabase session on load:', err);
+        logger.error('Failed to retrieve Supabase session on load:', err);
         setError(err.message || 'Supabase authentication failed.');
         setLoading(false);
       }
@@ -124,10 +125,10 @@ export default function GoogleSignInPage() {
                 credits_balance: 0,
               });
             if (insertError && insertError.code !== '23505') {
-              console.warn('Profile insert skipped (RLS policy):', insertError.message, insertError.code);
+              logger.warn('Profile insert skipped (RLS policy):', insertError.message, insertError.code);
             }
           } catch (profileErr) {
-            console.warn('Profile insert failed (non-fatal):', profileErr);
+            logger.warn('Profile insert failed (non-fatal):', profileErr);
           }
         }
 
@@ -143,14 +144,11 @@ export default function GoogleSignInPage() {
           designation: formData.designation || undefined,
         });
 
-        // 3. Inject raw Google payload in JSON format for db reference later
-        const storedUser = localStorage.getItem('inspection_user');
+        // 3. Inject raw Google payload in encrypted storage
+        const storedUser = await secureRetrieve<any>('inspection_user');
         if (storedUser) {
-          try {
-            const parsed = JSON.parse(storedUser);
-            parsed.googleProfile = googleProfile;
-            localStorage.setItem('inspection_user', JSON.stringify(parsed));
-          } catch {}
+          storedUser.googleProfile = googleProfile;
+          await secureStore('inspection_user', storedUser);
         }
 
         localStorage.removeItem('temp_signup_form');
@@ -170,29 +168,26 @@ export default function GoogleSignInPage() {
                 credits_balance: 0,
               });
             if (insertError && insertError.code !== '23505') {
-              console.warn('Profile insert skipped (RLS policy):', insertError.message, insertError.code);
+              logger.warn('Profile insert skipped (RLS policy):', insertError.message, insertError.code);
             }
           } catch (profileErr) {
-            console.warn('Profile insert failed (non-fatal):', profileErr);
+            logger.warn('Profile insert failed (non-fatal):', profileErr);
           }
         }
 
         await login(googleName, 'Inspector', mockIdToken, googleProfile);
         
-        // Sync googleProfile on login
-        const storedUser = localStorage.getItem('inspection_user');
+        // Sync googleProfile on login securely
+        const storedUser = await secureRetrieve<any>('inspection_user');
         if (storedUser) {
-          try {
-            const parsed = JSON.parse(storedUser);
-            parsed.googleProfile = googleProfile;
-            localStorage.setItem('inspection_user', JSON.stringify(parsed));
-          } catch {}
+          storedUser.googleProfile = googleProfile;
+          await secureStore('inspection_user', storedUser);
         }
 
         router.push('/dashboard');
       }
     } catch (err: any) {
-      console.error('Error post-processing Supabase sign-in:', err);
+      logger.error('Error post-processing Supabase sign-in:', err);
       setError(err.message || 'Error processing account data.');
       setLoading(false);
     }
@@ -250,14 +245,11 @@ export default function GoogleSignInPage() {
           designation: formData.designation || undefined,
         });
 
-        // 3. Inject raw Google payload in JSON format for db reference later
-        const storedUser = localStorage.getItem('inspection_user');
+        // 3. Inject raw Google payload in encrypted storage
+        const storedUser = await secureRetrieve<any>('inspection_user');
         if (storedUser) {
-          try {
-            const parsed = JSON.parse(storedUser);
-            parsed.googleProfile = googleProfile;
-            localStorage.setItem('inspection_user', JSON.stringify(parsed));
-          } catch {}
+          storedUser.googleProfile = googleProfile;
+          await secureStore('inspection_user', storedUser);
         }
 
         localStorage.removeItem('temp_signup_form');
@@ -266,14 +258,11 @@ export default function GoogleSignInPage() {
         // Login Flow
         await login(name, 'Inspector', mockIdToken, googleProfile);
 
-        // Sync googleProfile on login for mock fallback
-        const storedUser = localStorage.getItem('inspection_user');
+        // Sync googleProfile on login for mock fallback securely
+        const storedUser = await secureRetrieve<any>('inspection_user');
         if (storedUser) {
-          try {
-            const parsed = JSON.parse(storedUser);
-            parsed.googleProfile = googleProfile;
-            localStorage.setItem('inspection_user', JSON.stringify(parsed));
-          } catch {}
+          storedUser.googleProfile = googleProfile;
+          await secureStore('inspection_user', storedUser);
         }
 
         router.push('/dashboard');

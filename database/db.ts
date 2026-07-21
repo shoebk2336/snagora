@@ -137,11 +137,13 @@ class InspectionDatabase extends Dexie {
 
 export const db = new InspectionDatabase();
 
+import { logger } from '@/utils/logger';
+
 // Handle version changes to prevent database upgrades from hanging
 if (typeof window !== 'undefined') {
   db.on('versionchange', () => {
     db.close();
-    console.log('Database version change detected. Connection closed to allow upgrade.');
+    logger.log('Database version change detected. Connection closed to allow upgrade.');
   });
 }
 
@@ -150,7 +152,7 @@ export async function seedDatabase() {
   const projectCount = await db.projects.count();
   if (projectCount > 0) return; // Already seeded
 
-  console.log('Seeding offline building database...');
+  logger.log('Seeding offline building database...');
 
   // 1. Projects
   const projects: Project[] = [

@@ -512,7 +512,7 @@ export default function IssuePage() {
       </header>
 
       {/* Form Content */}
-      <form ref={formRef} onSubmit={handleSaveIssue} className="p-4 space-y-5 flex-1 overflow-y-auto no-scrollbar pb-24 min-h-0">
+      <form ref={formRef} onSubmit={handleSaveIssue} className="p-4 space-y-5 flex-1 overflow-y-auto no-scrollbar pb-4 min-h-0">
         
         {/* Description */}
         <div className="space-y-1.5">

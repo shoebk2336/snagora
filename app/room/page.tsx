@@ -350,7 +350,7 @@ export default function RoomPage() {
       ) : (
         
         // 2. ROOM HIERARCHY SELECTOR SCREEN — with on-the-fly creation
-        <div className="flex-1 overflow-y-auto no-scrollbar p-4 space-y-6 pb-24 min-h-0">
+        <div className="flex-1 overflow-y-auto no-scrollbar p-4 space-y-6 pb-4 min-h-0">
           {/* Header */}
           <div className="flex items-center gap-3">
             <Link 

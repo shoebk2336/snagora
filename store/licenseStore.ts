@@ -4,10 +4,11 @@
  */
 
 import { create } from 'zustand';
-import { secureStore, secureRetrieve, secureRemove, verifyLicenseSignature, detectTimeTampering, recordCurrentTime } from '@/utils/crypto';
+import { verifyLicenseSignature, detectTimeTampering, recordCurrentTime, secureStore, secureRetrieve, secureRemove } from '@/utils/crypto';
 import type { License } from '@/api/mockResponses';
 import { consumeCreditsOnBackend } from '@/api/licenseApi';
 import { useAuthStore } from './authStore';
+import { logger } from '@/utils/logger';
 
 const LICENSE_STORAGE_KEY = 'snagora_license';
 const VALIDATION_WINDOW_DAYS = 28;
@@ -66,7 +67,7 @@ export const useLicenseStore = create<LicenseState>((set, get) => ({
       }
 
       if (!isValid) {
-        console.error('License signature verification failed — rejecting license');
+        logger.error('License signature verification failed — rejecting license');
         return;
       }
 
@@ -87,7 +88,7 @@ export const useLicenseStore = create<LicenseState>((set, get) => ({
         isLoaded: true,
       });
     } catch (e) {
-      console.error('Failed to store license:', e);
+      logger.error('Failed to store license:', e);
     }
   },
 
@@ -102,7 +103,7 @@ export const useLicenseStore = create<LicenseState>((set, get) => ({
 
       // Check for time tampering
       if (detectTimeTampering()) {
-        console.warn('Time tampering detected — license may be invalid');
+        logger.warn('Time tampering detected — license may be invalid');
         set({
           license,
           subscriptionStatus: 'pending_validation',
@@ -132,7 +133,7 @@ export const useLicenseStore = create<LicenseState>((set, get) => ({
 
       return license;
     } catch (e) {
-      console.error('Failed to load license:', e);
+      logger.error('Failed to load license:', e);
       set({ license: null, subscriptionStatus: 'inactive', isLoaded: true });
       return null;
     }
@@ -178,7 +179,7 @@ export const useLicenseStore = create<LicenseState>((set, get) => ({
         await consumeCreditsOnBackend(customerId, deviceId, 5);
       }
     } catch (err) {
-      console.error('Failed to sync consumed credits to backend:', err);
+      logger.error('Failed to sync consumed credits to backend:', err);
     }
 
     return true;

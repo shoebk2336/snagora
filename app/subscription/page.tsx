@@ -220,7 +220,7 @@ export default function SubscriptionPage() {
 
   return (
     <div className="flex flex-1 flex-col bg-background h-full w-full overflow-hidden relative min-h-0">
-      <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-4 space-y-5 pb-24 flex flex-col min-h-0">
+      <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-4 space-y-5 pb-4 flex flex-col min-h-0">
 
         {/* Header */}
         <div className="flex items-center gap-3">

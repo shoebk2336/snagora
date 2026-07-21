@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { secureStore, secureRetrieve, secureRemove } from '@/utils/crypto';
 import { supabase, isSupabaseConfigured } from '@/utils/supabase';
+import { logger } from '@/utils/logger';
 
 export type UserRole = 'Technician' | 'Auditor' | 'Inspector';
 export type RegistrationStatus = 'unregistered' | 'registered' | 'activated';
@@ -81,7 +82,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       try {
         await supabase.auth.signOut();
       } catch (err) {
-        console.error('Error signing out of Supabase:', err);
+        logger.error('Error signing out of Supabase:', err);
       }
     }
     secureRemove('inspection_user');
@@ -156,7 +157,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
               }
             }
           } catch (err) {
-            console.warn('Failed to fetch backend profile status:', err);
+            logger.warn('Failed to fetch backend profile status:', err);
           }
 
           // Apply local simulator override if present
@@ -191,8 +192,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ user, isLoaded: true });
       return user;
     } catch (e) {
-      console.error('Failed to load secure session:', e);
-      set({ user: null, isLoaded: true });
+      logger.error('Failed to load secure session:', e);
+      set({ isLoaded: true });
       return null;
     }
   },
@@ -217,7 +218,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           }
         }
       } catch (err) {
-        console.warn('Failed to fetch backend profile status during sync:', err);
+        logger.warn('Failed to fetch backend profile status during sync:', err);
       }
     }
 
@@ -274,7 +275,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           .update({ status: dbStatus })
           .eq('id', existing.googleIdToken);
       } catch (err) {
-        console.warn('Failed to update Supabase status on toggle:', err);
+        logger.warn('Failed to update Supabase status on toggle:', err);
       }
     }
 

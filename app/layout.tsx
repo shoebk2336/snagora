@@ -14,6 +14,7 @@ import BottomNavigation from '@/components/BottomNavigation';
 import { Sun, Moon, RotateCcw, Play, CheckCircle, Shield, Coins, RefreshCw, ShieldAlert } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '@/utils/supabase';
 import { validateLicense } from '@/api/licenseApi';
+import { logger } from '@/utils/logger';
 
 function CoinCreditsFetcher() {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -139,7 +140,7 @@ export default function RootLayout({
             setRunningNotification(null);
           }
         } catch (err) {
-          console.warn('Failed to load notifications:', err);
+          logger.warn('Failed to load notifications:', err);
         }
       };
       getNotifications();
@@ -167,7 +168,7 @@ export default function RootLayout({
 
           // If coupon is not found in DB OR assigned_to_email is no longer the user's email, coupon has been removed/revoked!
           if (error || !coupon || coupon.assigned_to_email?.toLowerCase() !== userEmail.toLowerCase()) {
-            console.warn('Assigned coupon has been removed or reassigned! Revoking credits...');
+            logger.warn('Assigned coupon has been removed or reassigned! Revoking credits...');
             
             // Clear client license and credits locally
             await clearLicense();
@@ -185,7 +186,7 @@ export default function RootLayout({
             window.location.reload();
           }
         } catch (err) {
-          console.error('Error during coupon safety check:', err);
+          logger.error('Error during coupon safety check:', err);
         }
       };
       
@@ -200,14 +201,14 @@ export default function RootLayout({
     // 1. Seed IndexedDB Database
     const initDb = async () => {
       const timeoutId = setTimeout(() => {
-        console.warn('Database initialization timed out. Forcing app to load.');
+        logger.warn('Database initialization timed out. Forcing app to load.');
         setDbReady(true);
       }, 3500);
 
       try {
         await seedDatabase();
       } catch (e) {
-        console.error('IndexedDB seeding failed', e);
+        logger.error('IndexedDB seeding failed', e);
       } finally {
         clearTimeout(timeoutId);
         setDbReady(true);
@@ -221,7 +222,7 @@ export default function RootLayout({
         try {
           await loadSession();
         } catch (e) {
-          console.error('Failed to load secure auth session', e);
+          logger.error('Failed to load secure auth session', e);
         }
       };
       initAuth();
@@ -245,7 +246,7 @@ export default function RootLayout({
             }
           }
         } catch (e) {
-          console.error('License load failed', e);
+          logger.error('License load failed', e);
         } finally {
           setLicenseChecked(true);
         }
@@ -297,7 +298,7 @@ export default function RootLayout({
   if (!dbReady) {
     return (
       <html lang="en" className="h-full" suppressHydrationWarning>
-        <body className="flex h-full items-center justify-center bg-slate-900 text-white" suppressHydrationWarning>
+        <body className="h-full bg-slate-900 text-white flex items-center justify-center" suppressHydrationWarning>
           <div className="text-center space-y-4">
             <div className="h-10 w-10 animate-spin rounded-full border-4 border-accent border-t-transparent mx-auto" />
             <p className="text-sm font-semibold tracking-wider uppercase text-slate-400">Initializing Database...</p>
@@ -316,12 +317,12 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
-      <body className="min-h-full bg-slate-100 dark:bg-slate-950 flex items-center justify-center antialiased" suppressHydrationWarning>
+      <body className="h-dvh bg-slate-100 dark:bg-slate-950 flex items-center justify-center antialiased overflow-hidden" suppressHydrationWarning>
         {/* Constrain mobile view in desktop browser */}
-        <div className="w-full max-w-md h-dvh bg-background text-foreground shadow-2xl relative flex flex-col pb-16 overflow-hidden">
+        <div className="w-full max-w-md h-dvh bg-background text-foreground shadow-2xl relative flex flex-col overflow-hidden">
           
           {/* Global Header */}
-          <header className="flex h-14 items-center justify-between border-b border-border bg-surface px-4 z-10 sticky top-0">
+          <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-surface px-4 z-10">
             <span className="font-black text-lg tracking-tight flex items-center gap-1.5 select-none">
               <span className="w-2.5 h-2.5 rounded-full bg-accent animate-pulse" />
               <span className="text-foreground font-black">
@@ -369,7 +370,7 @@ export default function RootLayout({
           )}
 
           {/* Page contents slot */}
-          <main className="flex-1 flex flex-col overflow-hidden relative min-h-0">
+          <main className="flex-1 flex flex-col overflow-hidden relative min-h-0 min-w-0">
             {isGateRoute || (authLoaded && user) ? (
               children
             ) : (

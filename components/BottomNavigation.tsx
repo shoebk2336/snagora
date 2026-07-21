@@ -26,7 +26,7 @@ export default function BottomNavigation() {
 
   return (
     <>
-      <div className="absolute bottom-0 left-0 right-0 z-40 bg-surface border-t border-border shadow-lg pb-safe">
+      <div className="shrink-0 z-40 bg-surface border-t border-border shadow-lg pb-safe">
         <div className="flex h-16 items-center justify-around px-4">
           {navItems.map(item => {
             const Icon = item.icon;

@@ -10,6 +10,7 @@ import {
   CreditCard, Tag, Loader2, CheckCircle, Shield,
   AlertCircle, ArrowRight, Sparkles, Mail, Info, ExternalLink
 } from 'lucide-react';
+import { logger } from '@/utils/logger';
 
 type ActivationMethod = 'choose' | 'coupon' | 'paypal' | 'sales';
 
@@ -156,7 +157,7 @@ function ActivateContent() {
 
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        console.error('Failed to send inquiry:', errData);
+        logger.error('Failed to send inquiry:', errData);
         setError('Failed to send inquiry. Please try again.');
         setLoading(false);
         return;

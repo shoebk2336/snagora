@@ -189,7 +189,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-1 flex-col bg-background h-full w-full overflow-hidden relative min-h-0">
-      <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-4 space-y-6 pb-24 min-h-0">
+      <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-4 space-y-6 pb-4 min-h-0">
         
         {/* User greeting header card */}
         <div className="p-4 rounded-3xl bg-gradient-to-r from-gradient-from via-gradient-via to-gradient-to text-white shadow-md border border-accent/20">

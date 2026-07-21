@@ -1,3 +1,5 @@
+import { logger } from './logger';
+
 /**
  * Cryptographic utilities for license encryption, signature verification,
  * and device fingerprinting. Uses Web Crypto API (no external deps).
@@ -50,7 +52,7 @@ export async function encryptData(plaintext: string): Promise<string> {
     
     return btoa(String.fromCharCode(...combined));
   } catch (e) {
-    console.error('Encryption failed:', e);
+    logger.error('Encryption failed:', e);
     throw new Error('Failed to encrypt data');
   }
 }
@@ -71,7 +73,7 @@ export async function decryptData(ciphertext: string): Promise<string> {
 
     return new TextDecoder().decode(decrypted);
   } catch (e) {
-    console.error('Decryption failed:', e);
+    logger.error('Decryption failed:', e);
     throw new Error('Failed to decrypt data – license may be corrupted');
   }
 }
@@ -106,7 +108,7 @@ export async function verifyLicenseSignature(
       encoder.encode(payload)
     );
   } catch (e) {
-    console.error('Signature verification failed:', e);
+    logger.error('Signature verification failed:', e);
     return false;
   }
 }
@@ -205,7 +207,7 @@ export async function secureRetrieve<T>(key: string): Promise<T | null> {
     const json = await decryptData(encrypted);
     return JSON.parse(json) as T;
   } catch {
-    console.error(`Failed to retrieve secure data for key: ${key}`);
+    logger.error(`Failed to retrieve secure data for key: ${key}`);
     return null;
   }
 }
